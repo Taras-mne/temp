@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foldy — coming soon</title>
+<meta name="description" content="You don't need a cloud, you need a folder.">
+<meta property="og:title" content="Foldy">
+<meta property="og:description" content="You don't need a cloud, you need a folder.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://foldy.io">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23e8474a'/%3E%3Cpath d='M22 38h22l8 8h26v30H22z' fill='none' stroke='white' stroke-width='6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --text: #f5f5f5;
+    --text-dim: #6e6e6e;
+    --accent: #e8474a;
+    --border: rgba(255,255,255,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+  .wrap {
+    max-width: 780px;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Hero text */
+  h1 {
+    font-size: clamp(36px, 7vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 36px;
+  }
+  h1 .you-need {
+    display: block;
+  }
+  h1 .folder {
+    color: var(--accent);
+  }
+
+  /* Wordmark below the slogan, smaller and monospace. */
+  .brand {
+    margin-bottom: 24px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+  }
+
+  /* Coming soon — plain text, no border. */
+  .soon {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* Bottom-pinned community credit. Small, monospace, dim. */
+  .credit {
+    position: fixed;
+    bottom: 16px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    opacity: 0.6;
+    z-index: 1;
+  }
+
+  footer {
+    padding: 28px 24px;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+  footer a {
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  footer a:hover {
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+
+  main { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="wrap">
+    <h1>
+      You don&rsquo;t need a cloud.
+      <span class="you-need">You need <span class="folder">a folder</span>.</span>
+    </h1>
+
+    <div class="brand">FOLDY.IO</div>
+
+    <div class="soon">Coming soon</div>
+  </div>
+</main>
+
+<div class="credit">NVP COMMUNITY</div>
+
+</body>
+</html>
