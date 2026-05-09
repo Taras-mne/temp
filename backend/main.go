@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"log"
@@ -12,9 +13,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/resend/resend-go/v3"
 	"modernc.org/sqlite"
 	sqlite3 "modernc.org/sqlite/lib"
 )
+
+//go:embed templates/welcome.html
+var welcomeTemplate string
 
 type subscribeRequest struct {
 	Email string `json:"email"`
@@ -28,6 +33,13 @@ type apiResponse struct {
 func main() {
 	addr := envOr("FOLDY_SUBSCRIBE_ADDR", "127.0.0.1:7043")
 	dbPath := envOr("FOLDY_SUBSCRIBE_DB", "subscribers.db")
+
+	apiKey := os.Getenv("RESEND_API_KEY")
+	if apiKey == "" {
+		log.Fatal("RESEND_API_KEY env var is required")
+	}
+	fromAddr := envOr("RESEND_FROM", "Foldy <hello@foldy.io>")
+	resendClient := resend.NewClient(apiKey)
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -45,7 +57,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/api/subscribe", subscribeHandler(db))
+	mux.HandleFunc("/api/subscribe", subscribeHandler(db, resendClient, fromAddr))
 
 	srv := &http.Server{
 		Addr:         addr,
@@ -60,7 +72,7 @@ func main() {
 	}
 }
 
-func subscribeHandler(db *sql.DB) http.HandlerFunc {
+func subscribeHandler(db *sql.DB, resendClient *resend.Client, from string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			writeJSON(w, http.StatusMethodNotAllowed, apiResponse{Error: "method not allowed"})
@@ -100,8 +112,35 @@ func subscribeHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Fire-and-forget welcome email — don't block the user's HTTP response.
+		go sendWelcome(resendClient, from, email)
+
 		writeJSON(w, http.StatusCreated, apiResponse{OK: true})
 	}
+}
+
+func sendWelcome(client *resend.Client, from, to string) {
+	html := strings.ReplaceAll(
+		welcomeTemplate,
+		"{unsubscribe_link}",
+		"mailto:unsubscribe@foldy.io?subject=unsubscribe",
+	)
+
+	sent, err := client.Emails.Send(&resend.SendEmailRequest{
+		From:    from,
+		To:      []string{to},
+		Subject: "You're on the list.",
+		Html:    html,
+		Headers: map[string]string{
+			"List-Unsubscribe":      "<mailto:unsubscribe@foldy.io>",
+			"List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+		},
+	})
+	if err != nil {
+		log.Printf("resend: welcome to %s failed: %v", to, err)
+		return
+	}
+	log.Printf("resend: welcome sent to %s, id=%s", to, sent.Id)
 }
 
 // isValidEmail does a conservative RFC 5322 parse plus a couple of shape
